@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>3D Tic Tac Toe</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="./index.css">
+</head>
+<body>
+
+  <center><h1>3D Tic Tac Toe</h1></center>
+
+  <center>
+    <div class="btn-group" role="group">
+      <button id="showLogin" type="button" class="btn btn-secondary">Login</button>
+      <button id="showRegister" type="button" class="btn btn-secondary">Register</button>
+    </div>
+    <form id="loginForm" action="/login" method="post">
+      <fieldset>
+        <legend>Login</legend>
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button>Login</button>
+      </fieldset>
+    </form>
+
+    <form id="registerForm" action="/register" method="post">
+      <div id="errMsgUsername" class="alert alert-secondary">
+        Username already in use. Please select a different username.
+      </div>
+      <div id="errMsgPassword" class="alert alert-warning">
+        Passwords don't match. Please verify passwords.
+      </div>
+      <div id="errMsgEmail" class="alert alert-warning">
+        This email address is already associated with an account. Please use a different email address.
+      </div>
+      <fieldset>
+        <legend>Personal Information</legend>
+        <input type="text" name="fname" placeholder="First Name" required><br>
+        <input type="text" name="lname" placeholder="Last Name" required><br>
+        <input type="email" id="email" name="email" placeholder="Email Address" required><br>
+        <input type="number" name="age" placeholder="Age" style="width:85px;" required>
+        <select name="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </fieldset>
+      <fieldset>
+        <legend>Login Credentials</legend>
+        <input type="text" id="username" name="username" placeholder="Username" required><br>
+        <input type="password" id="password1" name="password" placeholder="Password" required><br>
+        <input type="password" id="password2" name="password2" placeholder="Verify Password" required><br>
+      </fieldset>
+      <button type="button">Create Account</button>
+    </form>   
+  </center>
+  
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.dev.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./index.js"></script>
+</body>
+</html>

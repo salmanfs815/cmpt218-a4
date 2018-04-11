@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="./play.css">
+  <link rel="stylesheet" type="text/css" href="./dashboard.css">
 </head>
 <body>
 
@@ -13,42 +13,52 @@
 
   <div class="container">
     <div class="row">
-      <div class="col" id="board">
-        <table>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-        </table>
-        <br>
-        <table>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-        </table>
-        <br>
-        <table>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-          <tr><td> </td><td> </td><td> </td></tr>
-        </table>
+      <div class="col">
+        <h3>Player Info</h3>
+        Username: <span id="user"></span><br>
+        Wins: <span id="wins"></span><br>
+        Losses: <span id="losses"></span>
+        <hr>
+        Name: <span id="name"></span><br>
+        Email: <span id="email"></span><br>
+        Age: <span id="age"></span><br>
+        Gender: <span id="gender"></span><br>
       </div>
       <div class="col">
-        <h3 id="gameOver"></h3>
-        <div class="messages"></div>
-        <div id="number"></div>
-        <form action="javascript:void(0)">
-            <input type="text" id="message" required autofocus />
-            <span id='discon'>DISCONNECT</span>
-        </form>
+        <!-- <button>New Game</button><br> -->
+        <!-- <button>Logout</button> -->
+        <center>
+          <a href="/play" class="btn btn-secondary">New Game</a>
+          <br><br>
+          <a href="/logout" class="btn btn-secondary">Logout</a>
+        </center>
       </div>
     </div>
+  </div>
+  <hr>
+  <div>
+    <center><h3>Previous Games</h3></center>
+    <table>
+      <thead>
+        <tr>
+          <th>Player 1</th>
+          <th>Player 2</th>
+          <th>Winner</th>
+          <th># of Moves</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+        </tr>
+      </thead>
+      <tbody id="prevGames"></tbody>
+    </table>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.dev.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="./play.js"></script>
+  <script src="./dashboard.js"></script>
 </body>
 </html>
