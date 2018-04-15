@@ -1,18 +1,25 @@
+var socket = io("http://localhost:8000");
 
-var username = prompt("Please enter your name", "unknown");
-var numMoves = 0;
+var username = '';
+var opponent = ''
+var numMoves = -1; // nonnegative when game is in progress
+var playerNum = -1; // 0 or 1
+var roomId = ''; // name of game room
+var gameStartTime = 0;
 
 function printMessage(message) {
   var p = document.createElement("p");
   p.innerText = message;
-  document.querySelector("div.messages").appendChild(p);
+  var elem = document.querySelector("div.messages");
+  elem.appendChild(p);
+  elem.scrollTop = elem.scrollHeight;
 }
 
 function makeMove(move){
   /*
     move (integer):  index of cell to make move
   */
-  if (numMoves >= 0){
+  if (numMoves >= 0) {
     $('td')[move].innerHTML = numMoves%2===0?'X':'O';
     numMoves++;
     var game = gameState();
@@ -22,6 +29,17 @@ function makeMove(move){
       else if (game === 'X') {msg = 'X Won!';}
       else if (game === 'O') {msg = 'O Won!';}
       $('#gameOver').text(msg);
+      if (playerNum === 1) {
+        socket.emit('gameOver', {
+          room: roomId,
+          state: game,
+          player1: opponent,
+          player2: username,
+          moves: numMoves,
+          start: gameStartTime,
+          end: Date.now()
+        });
+      }
       numMoves = -1;
     }
   }
@@ -93,7 +111,7 @@ function gameState(){
       && $('td')[9*0+3*0+k].innerHTML === $('td')[9*1+3*1+k].innerHTML
       && $('td')[9*1+3*1+k].innerHTML === $('td')[9*2+3*2+k].innerHTML){
       console.log('i,j,k',0,0,k);
-      return $('td')[9*0+3*j+0].innerHTML;
+      return $('td')[9*0+3*0+k].innerHTML;
     }
     if ($('td')[9*0+3*2+k].innerHTML != ' '
       && $('td')[9*0+3*2+k].innerHTML === $('td')[9*1+3*1+k].innerHTML
@@ -109,44 +127,100 @@ function gameState(){
 document.querySelectorAll('td').forEach((cell, idx) => {
   cell.index = idx;
   cell.addEventListener('click', () => {
-    if (cell.innerHTML === ' '){
+    if (numMoves < 0) {
+      alert('The game has not yet begun.');
+    } else if (numMoves % 2 != playerNum) {
+      alert('Please wait for your opponent to make a move');
+    } else if (cell.innerHTML !== ' ') {
+      alert('This cell is not empty. Please select a different cell.');
+    } else {
       makeMove(cell.index)
-      socket.emit('move',cell.index);
+      socket.emit('move', {
+        room: roomId,
+        move: cell.index
+      });
     }
   });
 });
 
-var socket = io("http://localhost:8000");
 
-socket.on('connect', function(){
-  var msg = username + " has connected!!";
-  socket.emit('chat',msg);
+axios({
+  method: 'post',
+  url: '/play'
+}).then((res) => {
+  username = res.data.user;
+  // numMoves = 0;
+}).catch((err) => {
+  if (err.response.status === 401) {
+    alert('Please log in to continue.');
+    // redirect to login ('/')
+    $(location).attr('href', '/');
+  } else {
+    console.log(err);
+  }
 });
 
-socket.on('clientChange', function(clientNum){
-  document.querySelector("#number").innerHTML = clientNum + " clients connected";
+
+socket.on('connect', () => {
+  socket.emit('play');
 });
 
-socket.on('message',function(message){
-  printMessage(message);
+socket.on('newGame', (room) => {
+  roomId = room;
+  playerNum = 0;
+  console.log(`connected to room ${roomId} as player ${playerNum}`);
 });
 
-socket.on('move', (mvstr) => {
-  makeMove(Number(mvstr));
+socket.on('joinGame', (room) => {
+  roomId = room;
+  playerNum = 1;
+  console.log(`connected to room ${roomId} as player ${playerNum}`);
+  socket.emit('greet', {
+    room: roomId,
+    user: username
+  });
 });
 
-document.getElementById('discon').onclick = function(){
-  socket.emit('chat', `${username} has diconnected`);
-  printMessage("You have diconnected");
-  socket.close();
-  // re-direct
-}
+socket.on('greet', (user) => {
+  numMoves = 0;
+  opponent = user;
+  gameStartTime = Date.now();
+  socket.emit('greetReply', {
+    room: roomId,
+    user: username
+  });
+});
+
+socket.on('greetReply', (user) => {
+  numMoves = 0;
+  opponent = user;
+  gameStartTime = Date.now();
+})
+
+socket.on('move', (move) => {
+  makeMove(move);
+});
+
+socket.on('chat', (msg) => {
+  printMessage('opponent' + ': ' + msg);
+});
+
+socket.on('gameOver', (game) => {
+  var msg = "!!!";
+  if (game === 'D') {msg = 'Draw!';}
+  else if (game === 'X') {msg = 'X Won!';}
+  else if (game === 'O') {msg = 'O Won!';}
+  $('#gameOver').text(msg);
+  numMoves = -1;
+});
 
 document.forms[0].onsubmit = function () {
-  var input = document.getElementById("message");
-  var msg = username + ": " + input.value
-  printMessage(msg);
-  socket.emit('chat',msg);
+  var input = document.getElementById('message');
+  var msg = input.value;
+  printMessage('me' + ': ' + msg);
+  socket.emit('chat', {
+    room: roomId,
+    chat: msg
+  });
   input.value = '';
 };
-

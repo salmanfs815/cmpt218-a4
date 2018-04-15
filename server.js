@@ -174,7 +174,7 @@ app.get('/prev-games', (req, res) => {
       ]
     }, (err, docs) => {
       if (err) { console.log(err); }
-      else { res.json(docs); console.log(docs); }
+      else { res.json(docs); }
     });
   } else { res.redirect(401, '/'); }
 })
@@ -186,27 +186,56 @@ app.post('/play', (req, res) => {
 });
 
 
-var clients = 0;
-io.on('connection', function(socket){
-  console.log('new connection');
-  clients++;
-  socket.emit('clientChange',clients);
-  socket.broadcast.emit('clientChange',clients);
+var roomId = '';
 
-  socket.on('chat', function(message){
-    socket.broadcast.emit('message',message);
+io.on('connection', (socket) => {
+
+  socket.on('play', () => {
+    if (roomId === '') { // need to create new room
+      roomId = String(Date.now());
+      socket.join(roomId);
+      socket.emit('newGame', roomId);
+    } else {
+      socket.join(roomId);
+      socket.emit('joinGame', roomId);
+      roomId = '';
+    }
   });
 
-  socket.on('move', function(mv){
-    socket.broadcast.emit('move',mv);
-  })
-
-  socket.on('disconnect', function(){
-    console.log('Disconnect event');
-    clients--;
-    //socket.emit('clientChange',clients);
-    socket.broadcast.emit('clientChange',clients);
+  socket.on('greet', (data) => {
+    socket.broadcast.to(data.room).emit('greet', data.user);
   });
 
-  socket.emit("message", "You're connected!!!");
+  socket.on('greetReply', (data) => {
+    socket.broadcast.to(data.room).emit('greetReply', data.user);
+  });
+
+  socket.on('move', (data) => {
+    socket.broadcast.to(data.room).emit('move', data.move);
+  });
+
+  socket.on('chat', (data) => {
+    socket.broadcast.to(data.room).emit('chat', data.chat);
+  });  
+
+  socket.on('gameOver', (data) => {
+    socket.broadcast.to(data.room).emit('gameOver', data.state);
+    var win = '';
+    if (data.state === 'D') { win = 'DRAW'; }
+    else if (data.state === 'X') { win = 'player1'; }
+    else if (data.state === 'O') { win = 'player2'; }
+    var game = new Game({
+      player1: data.player1,
+      player2: data.player2,
+      winner: win,
+      start: data.start,
+      end: data.end,
+      numMoves: data.moves
+    });
+    game.save((err)=>{
+      if (err) console.log(err);
+      else console.log('successfully saved game');
+    });
+  });
+
 });

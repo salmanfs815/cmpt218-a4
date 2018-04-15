@@ -12,9 +12,7 @@ axios({
   $('#age').text(res.data.age);
   $('#gender').text(res.data.gender);
 }).catch((err) => {
-  if (err.message === 'Network Error') {
-    // display network error message
-  } else if (err.response.status === 401) {
+  if (err.response.status === 401) {
     alert('Please log in to continue.');
     // redirect to login ('/')
     $(location).attr('href', '/');
